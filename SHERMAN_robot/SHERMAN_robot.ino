@@ -62,19 +62,22 @@ pinMode(IN4,OUTPUT);
 }
 
 //this is a function that input the value of the joystick and tell which way it's heading
-void convertXYtoAngle(uint16_t a,uint16_t b){
+float convertXYtoAngle(uint16_t a,uint16_t b){
 
  float x_cord,y_cord,angle;
  
  y_cord = map(a,0,1023,-512,512);
  x_cord = map(b,0,1023,-512,512);
- angle=atan2(y_cord,x_cord)*(180/PI);
- 
+ angle=atan2(y_cord,x_cord)*(180/PI);// obtaining the angle in degrees
+ return angle;
 }
+
 void loop() {
   // put your main code here, to run repeatedly:
+float inte_joystick;
 x=analogRead(A0);
 y=analogRead(A1);
+inte_joystick=sqrt(pow(abs(x-512),2),pow(abs(y-512),2)); //reading the intensity on the joystock
 bttnRead=digitalRead(swtchbutton);
 Serial.println("X:  Y:  Button:");
 Serial.print(x);
@@ -82,8 +85,9 @@ Serial.print("  ");
 Serial.print(y);
 Serial.print("  ");
 Serial.println(bttnRead);
-turningRight(40,20);
-delay(2000);
-
+Serial.print("angle= ");
+Serial.println(convertXYtoAngle(x,y));
+Serial.print("intensity on the joystick= ");
+Serial.println(inte_joystick);
 
 }
