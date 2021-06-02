@@ -1,4 +1,15 @@
 
+//Include Libraries
+#include <SPI.h>
+#include <nRF24L01.h>
+#include <RF24.h>
+
+//create an RF24 object
+RF24 radio(7, 8);  // CE, CSN
+
+//address through which two modules communicate.
+const byte address[6] = "00001";
+
 uint8_t swtchbutton=8;
 uint8_t bttnRead,ENA=6,ENB=5,IN1=48,IN2=46,IN3=52,IN4=50;
 double x,y,previousNum=0;
@@ -112,7 +123,7 @@ void mainDrive(float input_angle,double input_inte_joystick){
 
 void setup() {
   // put your setup code here, to run once:
-Serial.begin(9600);
+//Serial.begin(9600);
 pinMode(swtchbutton,INPUT); // INTITIALIZING THE PRESS BUTTON ON THE JOYSTIC AS INPUT
 
 //Initializing the motor pins as output
@@ -123,6 +134,18 @@ pinMode(IN2,OUTPUT);
 pinMode(IN3,OUTPUT);
 pinMode(IN4,OUTPUT);
 
+while (!Serial);
+
+   Serial.begin(9600);
+ 
+  radio.begin();
+ 
+  //set the address
+  radio.openReadingPipe(0, address);
+ 
+  //Set module as receiver
+  radio.startListening();
+
 }
 
 
@@ -131,8 +154,33 @@ void loop() {
   // put your main code here, to run repeatedly:
 double inte_joystick;
 double red_x,red_y;
-x=analogRead(A0);
-y=analogRead(A1);
+
+//Read the data if available in buffer
+  if (radio.available())
+  {
+    char joystickPos[10];
+    radio.read(&joystickPos, sizeof(joystickPos));
+    Serial.print("x, y: ");
+    Serial.println(joystickPos);
+    delay(1000);
+
+  //parsing the joystickPos string to obtain the x and y joystick positions
+  const char delimiter[] = ","; //the character to look for when parsing
+  char parsedStrings[2][5]; //char array to store parsed strings
+  char *token =  strtok(joystickPos, delimiter); //diving the string at ","
+    strncpy(parsedStrings[0], token, sizeof(parsedStrings[0]));//first one
+    for (int i = 1; i < 2; i++) {
+      token =  strtok(NULL, delimiter);
+      strncpy(parsedStrings[i], token, sizeof(parsedStrings[i]));
+    }
+
+    //for (int i = 0; i < 2; i++){
+      //Serial.println(parsedStrings[i]);}//  should have the 2 data strings parsed o
+     x = atoi(parsedStrings[0]);
+     y = atoi(parsedStrings[1]);
+  }
+  
+
 
 //reduced x because the center value is (500,500) and absolute function doesn't like calculation inside abs
 red_x = (x-514);
@@ -150,6 +198,7 @@ Serial.print("angle= ");
 Serial.println(convertXYtoAngle(x,y));
 Serial.print("intensity on the joystick= ");
 Serial.println(inte_joystick);
+
 for(int i=180;i>1;i-=10){
 mainDrive(i,10);
 Serial.println(i);
