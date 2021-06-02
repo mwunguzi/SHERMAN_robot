@@ -46,6 +46,42 @@ void turningRight(uint8_t speedl,uint8_t speedr){
   digitalWrite(IN4,HIGH);
 }
 
+//this is a function that input the value of the joystick and tell which way it's heading
+float convertXYtoAngle(uint16_t a,uint16_t b){
+
+ float x_cord,y_cord,angle;
+ 
+ y_cord = map(a,0,1023,-512,512)-2;
+ x_cord = map(b,0,1023,-512,512)+1;
+ Serial.print(" x_cordinate= ");
+ Serial.println(x_cord);
+ Serial.print("Y_cordinate= ");
+ Serial.println(y_cord);
+ angle=atan2(y_cord,x_cord)*(180/PI);// obtaining the angle in degrees
+ return floor(angle);
+}
+
+void mainDrive(float input_angle,double input_inte_joystick){
+
+  //checking the the angle of the joystict is in the first or the second Quadrant
+  if(input_angle>1){
+   
+    //setting the motor speed
+  analogWrite(ENB,(30-(cos(input_angle)))+input_inte_joystick);
+  analogWrite(ENA,30+input_inte_joystick);
+  
+ Serial.print(" speed A: ");
+ Serial.println(30+input_inte_joystick);
+ Serial.print("speed B ");
+ Serial.println((30-(cos(input_angle)))+input_inte_joystick);
+ 
+  //making initial 1 and initial 4 high to move forward
+  digitalWrite(IN1,HIGH);
+  digitalWrite(IN2,LOW);
+  digitalWrite(IN3,LOW);
+  digitalWrite(IN4,HIGH);
+  }
+}
 
 void setup() {
   // put your setup code here, to run once:
@@ -62,20 +98,7 @@ pinMode(IN4,OUTPUT);
 
 }
 
-//this is a function that input the value of the joystick and tell which way it's heading
-float convertXYtoAngle(uint16_t a,uint16_t b){
 
- float x_cord,y_cord,angle;
- 
- y_cord = map(a,0,1023,-512,512)-2;
- x_cord = map(b,0,1023,-512,512)+1;
- Serial.print(" x_cordinate= ");
- Serial.println(x_cord);
- Serial.print("Y_cordinate= ");
- Serial.println(y_cord);
- angle=atan2(y_cord,x_cord)*(180/PI);// obtaining the angle in degrees
- return floor(angle);
-}
 
 void loop() {
   // put your main code here, to run repeatedly:
@@ -86,7 +109,7 @@ y=analogRead(A1);
 
 //reduced x because the center value is (500,500) and absolute function doesn't like calculation inside abs
 red_x = (x-514);
-red_y = (y-512);
+red_y = (y-511);
 
 inte_joystick=pow((red_x*red_x) + (red_y*red_y),0.5); //reading the intensity on the joystock
 bttnRead=digitalRead(swtchbutton);
@@ -100,5 +123,9 @@ Serial.print("angle= ");
 Serial.println(convertXYtoAngle(x,y));
 Serial.print("intensity on the joystick= ");
 Serial.println(inte_joystick);
+for(int i=90;i>1;i-=12){
+mainDrive(i,10);
+Serial.println(i);
 delay(1000);
+}
 }
