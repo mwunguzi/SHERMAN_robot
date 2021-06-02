@@ -1,7 +1,7 @@
 
 uint8_t swtchbutton=8;
 uint8_t bttnRead,ENA=6,ENB=5,IN1=48,IN2=46,IN3=52,IN4=50;
-double x,y;
+double x,y,previousNum=0;
 
 
 //function of driving a robot forward
@@ -61,19 +61,45 @@ float convertXYtoAngle(uint16_t a,uint16_t b){
  return floor(angle);
 }
 
+//this is a function to control the change of the intensity on the joystick 
+double change_when_new_number(double num){
+  
+  double returnNum;
+  
+  if(previousNum >= num or previousNum < num){
+    
+    returnNum=previousNum-num;
+    previousNum=num;
+    return returnNum;
+    
+  }
+  
+}
+
+//this is a function to drive the robot in response to the joystick movement
 void mainDrive(float input_angle,double input_inte_joystick){
 
-  //checking the the angle of the joystict is in the first or the second Quadrant
+  double inputSpeedA,inputSpeedB; //This will be the values for the input to controll how fast the motors are moving
+  double changeInJoystick;
+  
+  //checking the the angle of the joystick is in the first or the second Quadrant
   if(input_angle>1){
-   
-    //setting the motor speed
-  analogWrite(ENB,(30-(cos(input_angle)))+input_inte_joystick);
-  analogWrite(ENA,30+input_inte_joystick);
+
+  changeInJoystick=change_when_new_number(input_inte_joystick);
+  inputSpeedA=30+changeInJoystick;
+  inputSpeedB=(30+(-20*cos((input_angle*PI/180))))+changeInJoystick;
+  
+
+  //setting the motor speed
+  analogWrite(ENB,inputSpeedB);
+  analogWrite(ENA,inputSpeedA);
   
  Serial.print(" speed A: ");
- Serial.println(30+input_inte_joystick);
+ Serial.println(inputSpeedA);
  Serial.print("speed B ");
- Serial.println((30-(cos(input_angle)))+input_inte_joystick);
+ Serial.println(inputSpeedB);
+ Serial.print("joystick: ");
+ Serial.println(change_when_new_number(input_inte_joystick));
  
   //making initial 1 and initial 4 high to move forward
   digitalWrite(IN1,HIGH);
@@ -82,6 +108,7 @@ void mainDrive(float input_angle,double input_inte_joystick){
   digitalWrite(IN4,HIGH);
   }
 }
+
 
 void setup() {
   // put your setup code here, to run once:
@@ -123,7 +150,7 @@ Serial.print("angle= ");
 Serial.println(convertXYtoAngle(x,y));
 Serial.print("intensity on the joystick= ");
 Serial.println(inte_joystick);
-for(int i=90;i>1;i-=12){
+for(int i=180;i>1;i-=10){
 mainDrive(i,10);
 Serial.println(i);
 delay(1000);
