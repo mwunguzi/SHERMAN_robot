@@ -11,7 +11,7 @@ RF24 radio(7, 8);  // CE, CSN
 const byte address[6] = "00001";
 
 uint8_t swtchbutton=8;
-uint8_t bttnRead,ENA=6,ENB=5,IN1=48,IN2=46,IN3=52,IN4=50;
+uint8_t bttnRead,ENA=6,ENB=5,IN1=48,IN2=46,IN3=24,IN4=22;
 double x,y,previousNum=0;
 
 
@@ -64,10 +64,10 @@ float convertXYtoAngle(uint16_t a,uint16_t b){
  
  y_cord = map(a,0,1023,-512,512)-2;
  x_cord = map(b,0,1023,-512,512)+1;
- Serial.print(" x_cordinate= ");
- Serial.println(x_cord);
- Serial.print("Y_cordinate= ");
- Serial.println(y_cord);
+// Serial.print(" x_cordinate= ");
+// Serial.println(x_cord);
+// Serial.print("Y_cordinate= ");
+// Serial.println(y_cord);
  angle=atan2(y_cord,x_cord)*(180/PI);// obtaining the angle in degrees
  return floor(angle);
 }
@@ -97,20 +97,20 @@ void mainDrive(float input_angle,double input_inte_joystick){
   if(input_angle>1){
 
   changeInJoystick=change_when_new_number(input_inte_joystick);
-  inputSpeedA=30+changeInJoystick;
-  inputSpeedB=(30+(-20*cos((input_angle*PI/180))))+changeInJoystick;
+  inputSpeedA=40;
+  inputSpeedB=(40+(-30*cos((input_angle*PI/180))));
   
 
   //setting the motor speed
   analogWrite(ENB,inputSpeedB);
   analogWrite(ENA,inputSpeedA);
   
- Serial.print(" speed A: ");
- Serial.println(inputSpeedA);
- Serial.print("speed B ");
- Serial.println(inputSpeedB);
- Serial.print("joystick: ");
- Serial.println(change_when_new_number(input_inte_joystick));
+// Serial.print(" speed A: ");
+// Serial.println(inputSpeedA);
+// Serial.print("speed B ");
+// Serial.println(inputSpeedB);
+// Serial.print("joystick: ");
+// Serial.println(change_when_new_number(input_inte_joystick));
  
   //making initial 1 and initial 4 high to move forward
   digitalWrite(IN1,HIGH);
@@ -118,13 +118,19 @@ void mainDrive(float input_angle,double input_inte_joystick){
   digitalWrite(IN3,LOW);
   digitalWrite(IN4,HIGH);
   }
+  if((input_angle>=0 and input_angle<2) and input_inte_joystick<2){
+
+    analogWrite(ENB,0);
+    analogWrite(ENA,0);
+    
+  }
 }
 
 
 void setup() {
   // put your setup code here, to run once:
 //Serial.begin(9600);
-pinMode(swtchbutton,INPUT); // INTITIALIZING THE PRESS BUTTON ON THE JOYSTIC AS INPUT
+//pinMode(swtchbutton,INPUT); // INTITIALIZING THE PRESS BUTTON ON THE JOYSTIC AS INPUT
 
 //Initializing the motor pins as output
 pinMode(ENA,OUTPUT);
@@ -160,9 +166,9 @@ double red_x,red_y;
   {
     char joystickPos[10];
     radio.read(&joystickPos, sizeof(joystickPos));
-    Serial.print("x, y: ");
-    Serial.println(joystickPos);
-    delay(1000);
+//    Serial.print("x, y: ");
+//    Serial.println(joystickPos);
+    //delay(1000);
 
   //parsing the joystickPos string to obtain the x and y joystick positions
   const char delimiter[] = ","; //the character to look for when parsing
@@ -188,20 +194,17 @@ red_y = (y-511);
 
 inte_joystick=pow((red_x*red_x) + (red_y*red_y),0.5); //reading the intensity on the joystock
 bttnRead=digitalRead(swtchbutton);
-Serial.println("X:  Y:  Button:");
-Serial.print(x);
-Serial.print("  ");
-Serial.print(y);
-Serial.print("  ");
-Serial.println(bttnRead);
-Serial.print("angle= ");
-Serial.println(convertXYtoAngle(x,y));
-Serial.print("intensity on the joystick= ");
-Serial.println(inte_joystick);
+//Serial.println("X:  Y:  Button:");
+//Serial.print(x);
+//Serial.print("  ");
+//Serial.print(y);
+//Serial.print("  ");
+//Serial.println(bttnRead);
+//Serial.print("angle= ");
+//Serial.println(convertXYtoAngle(x,y));
+//Serial.print("intensity on the joystick= ");
+//Serial.println(inte_joystick);
 
-for(int i=180;i>1;i-=10){
-mainDrive(i,10);
-Serial.println(i);
-delay(1000);
-}
+mainDrive(convertXYtoAngle(x,y),inte_joystick);
+
 }
