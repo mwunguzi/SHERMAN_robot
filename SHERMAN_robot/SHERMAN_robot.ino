@@ -118,6 +118,24 @@ void mainDrive(float input_angle,double input_inte_joystick){
   digitalWrite(IN3,LOW);
   digitalWrite(IN4,HIGH);
   }
+  else if(input_angle<1 and input_angle!= 0){ // condition to make the robot move backwards
+
+    changeInJoystick=change_when_new_number(input_inte_joystick);
+    inputSpeedA=40;
+    inputSpeedB=(40+(-30*cos((input_angle*PI/180))));
+  
+
+  //setting the motor speed
+  analogWrite(ENB,inputSpeedB);
+  analogWrite(ENA,inputSpeedA);
+
+  //making initial 2 and initial 3 high to move backward
+  digitalWrite(IN1,LOW);
+  digitalWrite(IN2,HIGH);
+  digitalWrite(IN3,HIGH);
+  digitalWrite(IN4,LOW);
+  
+  }
   if((input_angle>=0 and input_angle<2) and input_inte_joystick<2){
 
     analogWrite(ENB,0);
