@@ -167,6 +167,8 @@ void setup() {
   //set the address
   radio.openReadingPipe(0, address);
 
+  radio.setPALevel(RF24_PA_MAX);
+  radio.setDataRate(RF24_2MBPS);  
   //Set module as receiver
   radio.startListening();
 
@@ -212,11 +214,7 @@ void loop() {
 
   inte_joystick = pow((red_x * red_x) + (red_y * red_y), 0.5); //reading the intensity on the joystock
   bttnRead = digitalRead(swtchbutton);
-  //Serial.println("X:  Y:  Button:");
-  //Serial.print(x);
-  //Serial.print("  ");
-  //Serial.print(y);
-  //Serial.print("  ");
+//  Serial.print("  ");
   //Serial.println(bttnRead);
   //Serial.print("angle= ");
   //Serial.println(convertXYtoAngle(x,y));
