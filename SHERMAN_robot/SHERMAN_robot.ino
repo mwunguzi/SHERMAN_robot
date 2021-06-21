@@ -62,7 +62,7 @@ float convertXYtoAngle(uint16_t a, uint16_t b) {
 
   float x_cord, y_cord, angle;
 
-  y_cord = map(a, 0, 1023, -512, 512) - 2;
+  y_cord = map(a, 0, 1023, -512, 512) - 1;
   x_cord = map(b, 0, 1023, -512, 512) + 1;
   // Serial.print(" x_cordinate= ");
   // Serial.println(x_cord);
