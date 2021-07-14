@@ -158,7 +158,7 @@ void mainDrive(float input_angle, double input_inte_joystick) {
     digitalWrite(IN4, LOW);
   }
 
-  if (input_angle == -135) { //this is to stop the robot from moving when the remote is not connected
+  if (input_angle >= -138.00 and input_angle <= -135) { //this is to stop the robot from moving when the remote is not connected
 
     analogWrite(ENB, 0);
     analogWrite(ENA, 0);
