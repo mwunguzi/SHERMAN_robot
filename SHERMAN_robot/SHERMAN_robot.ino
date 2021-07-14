@@ -62,8 +62,8 @@ float convertXYtoAngle(uint16_t a, uint16_t b) {
 
   float x_cord, y_cord, angle;
 
-  y_cord = map(a, 0, 1023, -512, 512) - 1;
-  x_cord = map(b, 0, 1023, -512, 512) + 1;
+  y_cord = map(a, 0, 1023, -512, 512) - 13;
+  x_cord = map(b, 0, 1023, -512, 512) - 5;
   
   // Serial.print(" x_cordinate= ");
   // Serial.println(x_cord);
@@ -148,7 +148,7 @@ void mainDrive(float input_angle, double input_inte_joystick) {
     digitalWrite(IN4, LOW);
 
   }
-  else if (input_angle == 0) {
+  if (input_angle == 0 ) {
 
     analogWrite(ENB, 0);
     analogWrite(ENA, 0);
@@ -195,7 +195,7 @@ void setup() {
   radio.openReadingPipe(0, address);
 
   radio.setPALevel(RF24_PA_MAX);
-  radio.setDataRate(RF24_2MBPS);
+  radio.setDataRate(RF24_1MBPS);
   //Set module as receiver
   radio.startListening();
 
@@ -208,11 +208,10 @@ void loop() {
   // put your main code here, to run repeatedly:
   double inte_joystick;
   double red_x, red_y;
-
+  //radio.startListening();
   //Read the data if available in buffer
   if (radio.available())
   {
-    
     char joystickPos[10];
     
     radio.read(&joystickPos, sizeof(joystickPos));
@@ -244,11 +243,14 @@ void loop() {
     y = atoi(parsedStrings[1]);
     
   }
-
-  //    Serial.print(" x_cordinate= ");
-  //    Serial.println(x);
-  //    Serial.print("Y_cordinate= ");
-  //    Serial.println(y);
+//  else if (! radio.available()){
+//    x=513;
+//    y=511;
+//  }
+      Serial.print(" x_cordinate= ");
+      Serial.println(x);
+      Serial.print("Y_cordinate= ");
+      Serial.println(y);
 
   //reduced x because the center value is (500,500) and absolute function doesn't like calculation inside abs
   red_x = (x - 513);
@@ -260,11 +262,11 @@ void loop() {
   
   //  Serial.print("  ");
   //Serial.println(bttnRead);
-  //Serial.print("angle= ");
-  //Serial.println(convertXYtoAngle(x,y));
+  Serial.print("angle= ");
+  Serial.println(convertXYtoAngle(x,y));
   //Serial.print("intensity on the joystick= ");
   //Serial.println(inte_joystick);
 
   mainDrive(convertXYtoAngle(x, y), inte_joystick);
-
+  
 }
