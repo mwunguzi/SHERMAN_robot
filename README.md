@@ -17,8 +17,8 @@ The project aims to create a remote-controlled robot capable of movement in vari
 * RF modules provide a communication range of up to 1km.
 
 ## Setup 
-1. Upload the Arduino sketch (robot_control.ino) to the Arduino Nano.
-2. Upload the Arduino sketch (robot_control.ino) to the Arduino Mega.
+1. Upload the Arduino sketch (Sherman_transmitter.ino) to the Arduino Nano.
+2. Upload the Arduino sketch (SHERMAN_robot.ino) to the Arduino Mega.
 3. Power on the tank robot and the remote controller.
 4. Use the joystick to control the movement of the tank robot.
 
